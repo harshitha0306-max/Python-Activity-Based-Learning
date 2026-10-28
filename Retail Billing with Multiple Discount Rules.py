@@ -1,20 +1,90 @@
-# Retail Billing with Multiple Discount Rules
+#Algorithm
 
-# Category-specific tax rates
+1. Start the program.
+2. Read the number of products.
+3. For each product, input its name, category, price, and quantity.
+4. Calculate the subtotal for each product using price × quantity.
+5. Calculate tax based on the product category.
+6. Add all product subtotals to obtain the total subtotal.
+7. Calculate the discount based on the bill amount and discount thresholds.
+8. Apply the maximum concession limit to the discount.
+9. Calculate the final bill by adding taxes and subtracting the discount.
+10. Display the itemized invoice, including product details, taxes, discount, and final amount.
+11. Stop the program.
+
+#flow chart
+          ┌───────────────┐
+          │     START     │
+          └───────┬───────┘
+                  │
+          ┌───────▼────────┐
+          │ Input Number   │
+          │ of Products    │
+          └───────┬────────┘
+                  │
+          ┌───────▼────────┐
+          │ Enter Product  │
+          │ Name, Category,│
+          │ Price, Quantity│
+          └───────┬────────┘
+                  │
+          ┌───────▼────────┐
+          │ Calculate      │
+          │ Subtotal       │
+          │ Price × Qty    │
+          └───────┬────────┘
+                  │
+          ┌───────▼────────┐
+          │ Calculate Tax  │
+          │ Based on       │
+          │ Product Category│
+          └───────┬────────┘
+                  │
+          ┌───────▼────────┐
+          │ More Products? │◄─────┐
+          └───────┬────────┘      │
+                  │ Yes            │
+                  └────────────────┘
+                  │ No
+          ┌───────▼────────┐
+          │ Calculate Total│
+          │ Subtotal & Tax │
+          └───────┬────────┘
+                  │
+          ┌───────▼────────┐
+          │ Check Discount │
+          │ Thresholds     │
+          └───────┬────────┘
+                  │
+          ┌───────▼────────┐
+          │ Apply Maximum  │
+          │ Discount Limit │
+          └───────┬────────┘
+                  │
+          ┌───────▼────────┐
+          │ Calculate Final│
+          │ Bill Amount    │
+          └───────┬────────┘
+                  │
+          ┌───────▼────────┐
+          │ Print Itemized │
+          │ Invoice        │
+          └───────┬────────┘
+                  │
+          ┌───────▼────────┐
+          │      STOP      │
+          └───────────────┘
+
+#code
 tax_rates = {
     "electronics": 18,
-    "clothing": 5,
-    "food": 0,
-    "grocery": 5
+    "clothing": 12,
+    "groceries": 5,
+    "other": 10
 }
 
-# Discount rules
-discount_threshold = 2000
-discount_rate = 10
-max_discount = 500
-
-items = []
-subtotal = 0
+products = []
+total_subtotal = 0
 total_tax = 0
 
 n = int(input("Enter number of products: "))
@@ -23,75 +93,90 @@ for i in range(n):
     print(f"\nProduct {i + 1}")
 
     name = input("Enter product name: ")
-    category = input(
-        "Enter category (electronics/clothing/food/grocery): "
-    ).lower()
-    price = float(input("Enter unit price (Rs.): "))
+    category = input("Enter category (electronics/clothing/groceries/other): ").lower()
+    price = float(input("Enter unit price: "))
     quantity = int(input("Enter quantity: "))
 
-    if price < 0 or quantity <= 0:
-        print("Invalid price or quantity. Try again.")
-        continue
-
     if category not in tax_rates:
-        print("Invalid category. Product skipped.")
-        continue
+        print("Invalid category! Using 10% tax.")
+        category = "other"
 
-    # Calculate item amount and tax
-    amount = price * quantity
-    tax = amount * tax_rates[category] / 100
+    subtotal = price * quantity
+    tax = subtotal * tax_rates[category] / 100
 
-    items.append({
+    products.append({
         "name": name,
         "category": category,
         "price": price,
         "quantity": quantity,
-        "amount": amount,
-        "tax_rate": tax_rates[category],
+        "subtotal": subtotal,
         "tax": tax
     })
 
-    subtotal += amount
+    total_subtotal += subtotal
     total_tax += tax
 
-# Calculate threshold discount
-discount = 0
-
-if subtotal >= discount_threshold:
-    discount = subtotal * discount_rate / 100
-    discount = min(discount, max_discount)
-
-# Calculate final bill
-final_total = subtotal - discount + total_tax
-
-# Generate itemized invoice
-print("\n" + "=" * 76)
-print("                    RETAIL STORE INVOICE")
-print("=" * 76)
-
-print(f"{'Product':<16}{'Category':<14}{'Price':>9}"
-      f"{'Qty':>5}{'Amount':>10}{'Tax':>7}{'Tax Amt':>10}")
-print("-" * 76)
-
-for item in items:
-    print(f"{item['name']:<16}"
-          f"{item['category']:<14}"
-          f"{item['price']:>9.2f}"
-          f"{item['quantity']:>5}"
-          f"{item['amount']:>10.2f}"
-          f"{item['tax_rate']:>6}%"
-          f"{item['tax']:>10.2f}")
-
-print("-" * 76)
-print(f"{'Subtotal:':<55} Rs. {subtotal:>10.2f}")
-print(f"{'Discount:':<55} Rs. {discount:>10.2f}")
-print(f"{'Total Tax:':<55} Rs. {total_tax:>10.2f}")
-print("=" * 76)
-print(f"{'FINAL AMOUNT:':<55} Rs. {final_total:>10.2f}")
-print("=" * 76)
-
-if discount > 0:
-    print(f"You saved Rs. {discount:.2f}!")
+# Apply threshold discount
+if total_subtotal >= 5000:
+    discount = total_subtotal * 0.10
+elif total_subtotal >= 2000:
+    discount = total_subtotal * 0.05
 else:
-    remaining = max(0, discount_threshold - subtotal)
-    print(f"Spend Rs. {remaining:.2f} more to qualify for a discount.")
+    discount = 0
+
+# Apply maximum concession limit
+discount = min(discount, 1000)
+
+final_amount = total_subtotal + total_tax - discount
+
+# Print itemized invoice
+print("\n========== RETAIL INVOICE ==========")
+print(f"{'Product':<15}{'Qty':>5}{'Subtotal':>12}{'Tax':>10}")
+
+for p in products:
+    print(f"{p['name']:<15}{p['quantity']:>5}"
+          f"{p['subtotal']:>12.2f}{p['tax']:>10.2f}")
+
+print("------------------------------------")
+print(f"Subtotal       : Rs. {total_subtotal:.2f}")
+print(f"Total Tax      : Rs. {total_tax:.2f}")
+print(f"Discount       : Rs. {discount:.2f}")
+print(f"Final Amount   : Rs. {final_amount:.2f}")
+print("====================================")
+
+
+#sample output
+Enter number of products: 3
+
+Product 1
+Enter product name: Laptop
+Enter category (electronics/clothing/groceries/other): electronics
+Enter unit price: 50000
+Enter quantity: 1
+
+Product 2
+Enter product name: Shirt
+Enter category (electronics/clothing/groceries/other): clothing
+Enter unit price: 1000
+Enter quantity: 2
+
+Product 3
+Enter product name: Rice
+Enter category (electronics/clothing/groceries/other): groceries
+Enter unit price: 200
+Enter quantity: 5
+
+========== RETAIL INVOICE ==========
+Product          Qty    Subtotal       Tax
+Laptop             1    50000.00   9000.00
+Shirt              2     2000.00    240.00
+Rice               5     1000.00     50.00
+------------------------------------
+Subtotal       : Rs. 53000.00
+Total Tax      : Rs. 9290.00
+Discount       : Rs. 1000.00
+Final Amount   : Rs. 61290.00
+====================================
+
+
+
