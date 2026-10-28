@@ -93,8 +93,6 @@
                   └─────────────────┘
 #code
 
-# Retail Billing with Multiple Discount Rules
-
 tax_rates = {
     "electronics": 18,
     "clothing": 12,
