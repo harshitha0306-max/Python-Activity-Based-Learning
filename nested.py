@@ -1,91 +1,220 @@
+#Algorithm
 
-# Nested List Examination Seating Validation
+1. Start the program.
+2. Input the number of rows and columns in the seating matrix.
+3. Input the seating arrangement using a nested list.
+4. Input the list of valid student roll numbers.
+5. Input the positions reserved for special purposes, such as staff desks or aisles.
+6. Traverse each seat using nested loops.
+7. Check whether each reserved position is occupied. If occupied, report an invalid allocation.
+8. Check whether any non-reserved seat is empty. If empty, report an empty seat.
+9. Check whether each assigned roll number belongs to the valid student list.
+10. Check whether any roll number appears more than once. If repeated, report a duplicate.
+11. Collect all validation errors.
+12. Display the seating matrix, errors, and overall validation status.
+13. Stop the program.
 
-# Seating matrix: None represents an empty seat
-seating_matrix = [
-    [101, 102, 103, None],
-    [104, 105, 101, 106],
-    [107, -1, 108, 109],
-    [110, 111, None, 112]
-]
+#Flow chart
+                 ┌─────────────────────┐
+             │        START        │
+             └──────────┬──────────┘
+                        │
+             ┌──────────▼──────────┐
+             │ Input Rows, Columns │
+             │ and Seating Matrix  │
+             └──────────┬──────────┘
+                        │
+             ┌──────────▼──────────┐
+             │ Input Valid Roll    │
+             │ Numbers and Reserved│
+             │ Positions           │
+             └──────────┬──────────┘
+                        │
+             ┌──────────▼──────────┐
+             │ Traverse Matrix     │
+             │ Using Nested Loops  │
+             └──────────┬──────────┘
+                        │
+             ┌──────────▼──────────┐
+             │ Is Seat Reserved?   │
+             └──────┬────────┬─────┘
+                   Yes       No
+                    │         │
+             ┌──────▼─────┐   │
+             │ Is Reserved│   │
+             │ Seat Empty?│   │
+             └──────┬─────┘   │
+                    │         │
+             ┌──────▼─────┐   │
+             │ Report     │   │
+             │ Occupied   │   │
+             │ Reserved   │   │
+             │ Seat       │   │
+             └──────┬─────┘   │
+                    │         │
+                    └────┬────┘
+                         │
+             ┌───────────▼─────────┐
+             │ Is Non-Reserved     │
+             │ Seat Empty?         │
+             └──────┬────────┬─────┘
+                   Yes       No
+                    │         │
+             ┌──────▼─────┐   │
+             │ Report     │   │
+             │ Empty Seat │   │
+             └──────┬─────┘   │
+                    │         │
+                    └────┬────┘
+                         │
+             ┌───────────▼─────────┐
+             │ Is Roll Number      │
+             │ Valid?              │
+             └──────┬────────┬─────┘
+                   No        Yes
+                    │         │
+             ┌──────▼─────┐   │
+             │ Report     │   │
+             │ Invalid    │   │
+             │ Allocation │   │
+             └──────┬─────┘   │
+                    │         │
+                    └────┬────┘
+                         │
+             ┌───────────▼─────────┐
+             │ Is Roll Number      │
+             │ Duplicated?         │
+             └──────┬────────┬─────┘
+                   Yes       No
+                    │         │
+             ┌──────▼─────┐   │
+             │ Report     │   │
+             │ Duplicate  │   │
+             └──────┬─────┘   │
+                    │         │
+                    └────┬────┘
+                         │
+             ┌───────────▼─────────┐
+             │ More Seats to Check?│
+             └──────┬────────┬─────┘
+                   Yes       No
+                    │         │
+                    │  ┌──────▼──────────┐
+                    │  │ Display Errors  │
+                    │  │ and Validation  │
+                    │  │ Status          │
+                    │  └──────┬──────────┘
+                    │         │
+                    │  ┌──────▼──────────┐
+                    │  │      STOP       │
+                    │  └─────────────────┘
+                    │
+                    └── Repeat for
+                        next seat
+        
+#Code
 
-# -1 represents a reserved position
-reserved_positions = [(2, 1)]
+rows = int(input("Enter number of rows: "))
+cols = int(input("Enter number of columns: "))
 
-# Valid roll numbers
-valid_roll_numbers = set(range(101, 113))
+seating = []
 
-seen_roll_numbers = set()
-duplicates = []
-empty_seats = []
-invalid_allocations = []
-reserved_violations = []
+print("Enter seating matrix (0 for empty seat):")
+for i in range(rows):
+    row = list(map(int, input().split()))
+    seating.append(row)
 
-rows = len(seating_matrix)
-cols = len(seating_matrix[0]) if rows > 0 else 0
+valid_rolls = list(map(
+    int, input("Enter valid roll numbers: ").split()
+))
+
+reserved_count = int(input("Enter number of reserved positions: "))
+reserved = set()
+
+for i in range(reserved_count):
+    r, c = map(
+        int,
+        input("Enter reserved row and column: ").split()
+    )
+    reserved.add((r - 1, c - 1))
+
+errors = []
+seen = set()
 
 # Validate matrix dimensions
-if any(len(row) != cols for row in seating_matrix):
-    print("Error: Seating matrix must be rectangular.")
-else:
-    for i in range(rows):
-        for j in range(cols):
-            roll = seating_matrix[i][j]
-            position = (i, j)
+for i in range(rows):
+    if len(seating[i]) != cols:
+        errors.append(f"Row {i + 1} has invalid column count")
 
-            # Check reserved positions
-            if position in reserved_positions:
-                if roll != -1:
-                    reserved_violations.append((position, roll))
-                continue
+# Validate seats
+for i in range(rows):
+    for j in range(cols):
+        if j >= len(seating[i]):
+            continue
 
-            # Check empty seats
-            if roll is None:
-                empty_seats.append(position)
-                continue
+        roll = seating[i][j]
+        position = (i, j)
 
-            # Check invalid allocations
-            if not isinstance(roll, int) or roll not in valid_roll_numbers:
-                invalid_allocations.append((position, roll))
-                continue
+        if position in reserved:
+            if roll != 0:
+                errors.append(
+                    f"Reserved seat ({i + 1},{j + 1}) is occupied"
+                )
+            continue
 
-            # Check duplicate roll numbers
-            if roll in seen_roll_numbers:
-                duplicates.append((position, roll))
+        if roll == 0:
+            errors.append(
+                f"Empty seat at ({i + 1},{j + 1})"
+            )
+
+        elif roll not in valid_rolls:
+            errors.append(
+                f"Invalid roll number {roll} at "
+                f"({i + 1},{j + 1})"
+            )
+
+        if roll != 0:
+            if roll in seen:
+                errors.append(f"Duplicate roll number: {roll}")
             else:
-                seen_roll_numbers.add(roll)
+                seen.add(roll)
 
-    # Display seating matrix
-    print("\nEXAMINATION SEATING MATRIX")
-    print("=" * 45)
+# Display report
+print("\n===== SEATING VALIDATION REPORT =====")
+print("Seating Matrix:")
 
-    for row in seating_matrix:
-        print(row)
+for row in seating:
+    print(row)
 
-    print("\nVALIDATION REPORT")
-    print("=" * 45)
+if errors:
+    print("\nValidation Errors:")
+    for error in errors:
+        print("-", error)
 
-    print("\n1. Duplicate Roll Numbers:")
-    print(duplicates if duplicates else "None")
+    print("\nStatus: INVALID SEATING ARRANGEMENT")
+else:
+    print("\nNo validation errors found.")
+    print("Status: VALID SEATING ARRANGEMENT")
 
-    print("\n2. Reserved Position Violations:")
-    print(reserved_violations if reserved_violations else "None")
+print("=====================================")
 
-    print("\n3. Empty Seats:")
-    print(empty_seats if empty_seats else "None")
+#Sample output
+Enter number of rows: 2
+Enter number of columns: 3
+Enter seating matrix (0 for empty seat):
+101 102 0
+101 999 105
+Enter valid roll numbers: 101 102 103 104 105
+Enter number of reserved positions: 1
+Enter reserved row and column: 1 3
+===== SEATING VALIDATION REPORT =====
+Seating Matrix:
+[101, 102, 0]
+[101, 999, 105]
 
-    print("\n4. Invalid Student Allocations:")
-    print(invalid_allocations if invalid_allocations else "None")
+Validation Errors:
+- Duplicate roll number: 101
+- Invalid roll number 999 at (2,2)
 
-    print("\n5. Final Status:")
-    if not any([
-        duplicates,
-        reserved_violations,
-        empty_seats,
-        invalid_allocations
-    ]):
-        print("Seating matrix is VALID.")
-    else:
-        print("Seating matrix is INVALID. Please correct the issues.")
-
-    print("=" * 45)
+Status: INVALID SEATING ARRANGEMENT
+=====================================
