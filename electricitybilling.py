@@ -92,7 +92,6 @@
                   │      STOP       │
                   └─────────────────┘
 #code
-
 tax_rates = {
     "electronics": 18,
     "clothing": 12,
