@@ -1,130 +1,178 @@
-
+#Algorithm
+1. Start the program.
+2. Input the number of areas and the number of days.
+3. Enter each area's name.
+4. For each area, input the daily water demand and actual water supplied for every day.
+5. Calculate the total demand and total supply for each area.
+6. Calculate the water shortage using:
+   
+   Shortage = Total Demand − Total Supply
+   
+   If the supply exceeds demand, treat the shortage as zero.
+7. Calculate the supply percentage for each area:
+   
+   Supply Percentage = (Total Supply / Total Demand) × 100
+8. Compare supply percentages to identify differences in water distribution.
+9. Identify the most underserved area as the area with the lowest supply percentage.
+10. Display total demand, total supply, shortage, supply percentage, and the most underserved area.
+11. Stop the program.
+#Flow chart
+             ┌───────────────┐
+             │     START     │
+             └───────┬───────┘
+                     │
+                     ▼
+       ┌───────────────────────────┐
+       │ Input number of areas     │
+       │ and number of days        │
+       └─────────────┬─────────────┘
+                     │
+                     ▼
+       ┌───────────────────────────┐
+       │ Input area name, daily    │
+       │ water demand and supply   │
+       └─────────────┬─────────────┘
+                     │
+                     ▼
+       ┌───────────────────────────┐
+       │ Calculate total demand    │
+       │ and total water supply    │
+       └─────────────┬─────────────┘
+                     │
+                     ▼
+       ┌───────────────────────────┐
+       │ Calculate water shortage  │
+       │ and supply percentage     │
+       └─────────────┬─────────────┘
+                     │
+                     ▼
+             ◇────────────────◇
+            /  Are all areas   \
+           <    processed?      >
+            \                  /
+             ◇────────┬───────◇
+                  No  │  Yes
+             ┌────────┘    └────────┐
+             │                     │
+             ▼                     ▼
+       ┌───────────────┐  ┌──────────────────────┐
+       │ Input data    │  │ Compare supply       │
+       │ for next area │  │ percentages          │
+       └───────┬───────┘  └──────────┬───────────┘
+               │                     │
+               └── Return to          ▼
+                   input     ┌──────────────────────┐
+                             │ Identify the most    │
+                             │ underserved area     │
+                             └──────────┬───────────┘
+                                        │
+                                        ▼
+                             ┌──────────────────────┐
+                             │ Display distribution │
+                             │ report and shortage  │
+                             └──────────┬───────────┘
+                                        │
+                                        ▼
+                                ┌───────────────┐
+                                │     STOP      │
+                                └───────────────┘
+#Code
 # Water Distribution Fairness Analysis
 
-# Water data in litres: area -> daily demand and supply
-water_data = {
-    "Area A": {
-        "demand": [1000, 1200, 1100],
-        "supply": [900, 1000, 950]
-    },
-    "Area B": {
-        "demand": [1500, 1400, 1600],
-        "supply": [1000, 1100, 1050]
-    },
-    "Area C": {
-        "demand": [800, 900, 850],
-        "supply": [750, 850, 800]
-    },
-    "Area D": {
-        "demand": [1200, 1300, 1250],
-        "supply": [600, 700, 650]
-    }
-}
+areas = int(input("Enter number of areas: "))
+days = int(input("Enter number of days: "))
 
-area_summary = {}
+records = []
 
-total_demand = 0
-total_supply = 0
+for i in range(areas):
+    name = input(f"\nEnter area {i + 1} name: ")
 
-print("=" * 85)
-print("             WATER DISTRIBUTION FAIRNESS REPORT")
-print("=" * 85)
+    total_demand = 0
+    total_supply = 0
 
-print(
-    f"{'Area':<12}{'Demand':<12}{'Supply':<12}"
-    f"{'Shortage':<12}{'Fulfilment %':<15}{'Status'}"
-)
-print("-" * 85)
+    for day in range(days):
+        print(f"Day {day + 1} for {name}:")
+        demand = float(input("Enter water demand: "))
+        supply = float(input("Enter water supplied: "))
 
-# Analyse each area across all days
-for area, data in water_data.items():
-    demand = sum(data["demand"])
-    supply = sum(data["supply"])
+        total_demand += demand
+        total_supply += supply
 
-    if len(data["demand"]) != len(data["supply"]):
-        print(f"Invalid data for {area}: day counts do not match.")
-        continue
+    shortage = max(0, total_demand - total_supply)
 
-    if any(x < 0 for x in data["demand"] + data["supply"]):
-        print(f"Invalid data for {area}: negative values found.")
-        continue
-
-    shortage = max(0, demand - supply)
-    fulfilment = (supply / demand * 100) if demand > 0 else 0
-
-    if fulfilment < 60:
-        status = "CRITICAL"
-    elif fulfilment < 80:
-        status = "UNDERSERVED"
-    elif fulfilment < 100:
-        status = "LOW"
+    if total_demand > 0:
+        percentage = (total_supply / total_demand) * 100
     else:
-        status = "ADEQUATE"
+        percentage = 0
 
-    area_summary[area] = {
-        "demand": demand,
-        "supply": supply,
+    records.append({
+        "name": name,
+        "demand": total_demand,
+        "supply": total_supply,
         "shortage": shortage,
-        "fulfilment": fulfilment
-    }
+        "percentage": percentage
+    })
 
-    total_demand += demand
-    total_supply += supply
+# Display analysis report
+print("\n===== WATER DISTRIBUTION REPORT =====")
+print("Area\tDemand\tSupply\tShortage\tSupply %")
 
+for area in records:
     print(
-        f"{area:<12}{demand:<12}{supply:<12}"
-        f"{shortage:<12}{fulfilment:<15.2f}{status}"
+        f"{area['name']}\t"
+        f"{area['demand']:g}\t"
+        f"{area['supply']:g}\t"
+        f"{area['shortage']:g}\t\t"
+        f"{area['percentage']:.2f}%"
     )
 
-print("-" * 85)
+# Identify most underserved area
+underserved = min(records, key=lambda x: x["percentage"])
+best_served = max(records, key=lambda x: x["percentage"])
 
-# Overall distribution analysis
-overall_shortage = max(0, total_demand - total_supply)
-overall_fulfilment = (
-    total_supply / total_demand * 100 if total_demand > 0 else 0
+print("\n===== FAIRNESS ANALYSIS =====")
+print("Most underserved area:", underserved["name"])
+print("Best served area:", best_served["name"])
+print(
+    "Supply percentage difference:",
+    f"{best_served['percentage'] - underserved['percentage']:.2f}%"
 )
 
-print(f"Total Demand       : {total_demand} litres")
-print(f"Total Supply       : {total_supply} litres")
-print(f"Total Shortage     : {overall_shortage} litres")
-print(f"Overall Fulfilment : {overall_fulfilment:.2f}%")
+#Sample output
+Enter number of areas: 3
+Enter number of days: 2
 
-# Identify areas with the largest shortage
-if area_summary:
-    most_underserved = max(
-        area_summary,
-        key=lambda area: area_summary[area]["shortage"]
-    )
+Enter area 1 name: Area A
+Day 1 for Area A:
+Enter water demand: 100
+Enter water supplied: 90
+Day 2 for Area A:
+Enter water demand: 100
+Enter water supplied: 80
 
-    lowest_fulfilment = min(
-        area_summary,
-        key=lambda area: area_summary[area]["fulfilment"]
-    )
+Enter area 2 name: Area B
+Day 1 for Area B:
+Enter water demand: 100
+Enter water supplied: 70
+Day 2 for Area B:
+Enter water demand: 100
+Enter water supplied: 60
 
-    print("\nMOST UNDERSERVED AREAS")
-    print("-" * 45)
-    print(
-        f"Largest shortage: {most_underserved} "
-        f"({area_summary[most_underserved]['shortage']} litres)"
-    )
-    print(
-        f"Lowest fulfilment: {lowest_fulfilment} "
-        f"({area_summary[lowest_fulfilment]['fulfilment']:.2f}%)"
-    )
+Enter area 3 name: Area C
+Day 1 for Area C:
+Enter water demand: 100
+Enter water supplied: 95
+Day 2 for Area C:
+Enter water demand: 100
+Enter water supplied: 90
 
-    print("\nPRIORITY RANKING (LOWEST FULFILMENT FIRST)")
-    print("-" * 45)
+===== WATER DISTRIBUTION REPORT =====
+Area    Demand  Supply  Shortage    Supply %
+Area A  200     170     30          85.00%
+Area B  200     130     70          65.00%
+Area C  200     185     15          92.50%
 
-    ranked_areas = sorted(
-        area_summary.items(),
-        key=lambda item: item[1]["fulfilment"]
-    )
-
-    for rank, (area, details) in enumerate(ranked_areas, start=1):
-        print(
-            f"{rank}. {area}: "
-            f"{details['fulfilment']:.2f}% fulfilment, "
-            f"{details['shortage']} litres shortage"
-        )
-
-print("=" * 85)
+===== FAIRNESS ANALYSIS =====
+Most underserved area: Area B
+Best served area: Area C
+Supply percentage difference: 27.50%
