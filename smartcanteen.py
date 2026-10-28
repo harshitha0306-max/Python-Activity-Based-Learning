@@ -1,105 +1,196 @@
+#Algorithm
 
-# Smart Canteen Order and Stock Management
+1. Start the program.
+2. Initialize the canteen menu with item names, prices, and available stock.
+3. Initialize total daily sales to zero.
+4. Input the number of customer orders.
+5. For each customer, display the menu and enter the requested item and quantity.
+6. Check whether the item exists in the menu.
+7. Check whether the requested quantity is positive and available in stock.
+8. If the item is unavailable or the quantity exceeds the stock, reject the order.
+9. Otherwise, calculate the bill using price multiplied by quantity.
+10. Deduct the ordered quantity from the available stock.
+11. Add the bill amount to total daily sales.
+12. Repeat the process for all customers.
+13. Display the daily sales total and remaining stock for each item.
+14. Stop the program
+#Flow chart
+             ┌──────────────────────┐
+             │        START         │
+             └──────────┬───────────┘
+                        │
+             ┌──────────▼───────────┐
+             │ Initialize Menu,     │
+             │ Prices and Stock     │
+             └──────────┬───────────┘
+                        │
+             ┌──────────▼───────────┐
+             │ Enter Number of      │
+             │ Customer Orders      │
+             └──────────┬───────────┘
+                        │
+             ┌──────────▼───────────┐
+             │ Enter Item Name and  │
+             │ Required Quantity    │
+             └──────────┬───────────┘
+                        │
+             ┌──────────▼───────────┐
+             │ Is Item Available    │
+             │ in Menu?             │
+             └──────┬─────────┬─────┘
+                   No         Yes
+                    │          │
+             ┌──────▼─────┐    │
+             │ Reject     │    │
+             │ Order      │    │
+             └──────┬─────┘    │
+                    │    ┌─────▼──────────┐
+                    │    │ Is Quantity    │
+                    │    │ Positive?      │
+                    │    └─────┬─────┬────┘
+                    │         No     Yes
+                    │          │      │
+                    │   ┌──────▼──┐   │
+                    │   │ Reject  │   │
+                    │   │ Order   │   │
+                    │   └──────┬──┘   │
+                    │          │  ┌───▼────────────┐
+                    │          │  │ Is Quantity    │
+                    │          │  │ in Stock?      │
+                    │          │  └───┬────────┬───┘
+                    │          │     No        Yes
+                    │          │      │         │
+                    │          │  ┌───▼────┐ ┌──▼──────────┐
+                    │          │  │ Reject │ │ Calculate   │
+                    │          │  │ Order  │ │ Bill Amount│
+                    │          │  └───┬────┘ └──┬──────────┘
+                    │          │      │         │
+                    │          │      │  ┌──────▼────────┐
+                    │          │      │  │ Update Stock  │
+                    │          │      │  │ and Daily     │
+                    │          │      │  │ Sales         │
+                    │          │      │  └──────┬────────┘
+                    │          │      │         │
+                    └──────────┴──────┴─────────┘
+                               │
+                    ┌──────────▼───────────┐
+                    │ More Orders Left?    │
+                    └────────┬────────┬────┘
+                            Yes       No
+                             │         │
+                             │  ┌──────▼──────────┐
+                             │  │ Display Daily   │
+                             │  │ Sales and       │
+                             │  │ Remaining Stock │
+                             │  └──────┬──────────┘
+                             │         │
+                             │  ┌──────▼──────────┐
+                             │  │      STOP       │
+                             │  └─────────────────┘
+                             │
+                             └── Repeat for
+                                 next order
+#Code
 
-# Initial inventory: item -> [price, available quantity]
-inventory = {
-    "Burger": [80, 20],
-    "Pizza": [120, 15],
-    "Sandwich": [50, 25],
-    "Juice": [30, 30],
-    "Coffee": [25, 20]
+menu = {
+    "dosa": {"price": 30, "stock": 10},
+    "tea": {"price": 10, "stock": 20},
+    "sandwich": {"price": 50, "stock": 5},
+    "samosa": {"price": 15, "stock": 8}
 }
 
-daily_sales = 0
-total_orders = 0
+total_sales = 0
 successful_orders = 0
-rejected_items = 0
+rejected_orders = 0
 
+print("========== CANTEEN MENU ==========")
+for item, details in menu.items():
+    print(f"{item.title():<12} Price: Rs.{details['price']}"
+          f"  Stock: {details['stock']}")
 
-def display_menu():
-    print("\n------ CANTEEN MENU ------")
-    print(f"{'Item':<12}{'Price (Rs.)':<15}{'Stock'}")
-    print("-" * 35)
+n = int(input("\nEnter number of customer orders: "))
 
-    for item, details in inventory.items():
-        print(f"{item:<12}{details[0]:<15}{details[1]}")
+for i in range(n):
+    print(f"\nCustomer Order {i + 1}")
+    item = input("Enter item name: ").lower()
+    quantity = int(input("Enter quantity: "))
 
+    if item not in menu:
+        print("Order rejected: Item not available in menu.")
+        rejected_orders += 1
 
-def process_order(customer, orders):
-    global daily_sales, total_orders
-    global successful_orders, rejected_items
+    elif quantity <= 0:
+        print("Order rejected: Quantity must be positive.")
+        rejected_orders += 1
 
-    total_orders += 1
-    bill = 0
-    valid_items = []
+    elif quantity > menu[item]["stock"]:
+        print("Order rejected: Insufficient stock.")
+        print("Available stock:", menu[item]["stock"])
+        rejected_orders += 1
 
-    print(f"\nOrder for: {customer}")
-    print("-" * 40)
+    else:
+        price = menu[item]["price"]
+        bill = price * quantity
 
-    # Validate the complete order before updating stock
-    for item, quantity in orders.items():
-        if quantity <= 0:
-            print(f"Rejected: Invalid quantity for {item}")
-            rejected_items += 1
-        elif item not in inventory:
-            print(f"Rejected: {item} is not on the menu")
-            rejected_items += 1
-        elif quantity > inventory[item][1]:
-            print(
-                f"Rejected: {item} - requested {quantity}, "
-                f"available {inventory[item][1]}"
-            )
-            rejected_items += 1
-        else:
-            valid_items.append((item, quantity))
-
-    # Process valid items
-    for item, quantity in valid_items:
-        price = inventory[item][0]
-        amount = price * quantity
-
-        inventory[item][1] -= quantity
-        bill += amount
-
-        print(f"{item:<12} x {quantity:<3} = Rs. {amount:.2f}")
-
-    if bill > 0:
+        menu[item]["stock"] -= quantity
+        total_sales += bill
         successful_orders += 1
-        daily_sales += bill
 
-    print("-" * 40)
-    print(f"Total Bill: Rs. {bill:.2f}")
+        print("Order accepted.")
+        print(f"Item: {item.title()}")
+        print(f"Quantity: {quantity}")
+        print(f"Bill Amount: Rs.{bill:.2f}")
 
+print("\n========== DAILY SALES REPORT ==========")
+print(f"Successful Orders: {successful_orders}")
+print(f"Rejected Orders: {rejected_orders}")
+print(f"Total Daily Sales: Rs.{total_sales:.2f}")
 
-# Display initial menu
-display_menu()
+print("\nRemaining Stock:")
+for item, details in menu.items():
+    print(f"{item.title():<12}: {details['stock']} units")
 
-# Successive customer orders
-orders_list = [
-    ("Customer 1", {"Burger": 2, "Juice": 3}),
-    ("Customer 2", {"Pizza": 2, "Coffee": 2}),
-    ("Customer 3", {"Sandwich": 4, "Juice": 40}),
-    ("Customer 4", {"Burger": 25, "Coffee": 1}),
-    ("Customer 5", {"Sandwich": 2, "Juice": 2})
-]
+print("========================================")
 
-for customer, orders in orders_list:
-    process_order(customer, orders)
+#Sample output
+========== CANTEEN MENU ==========
+Dosa         Price: Rs.30  Stock: 10
+Tea          Price: Rs.10  Stock: 20
+Sandwich     Price: Rs.50  Stock: 5
+Samosa       Price: Rs.15  Stock: 8
 
-# Daily summary
-print("\n" + "=" * 45)
-print("          DAILY SALES SUMMARY")
-print("=" * 45)
-print(f"Total Orders       : {total_orders}")
-print(f"Orders with Sales  : {successful_orders}")
-print(f"Rejected Items     : {rejected_items}")
-print(f"Total Daily Sales  : Rs. {daily_sales:.2f}")
+Enter number of customer orders: 3
 
-print("\nREMAINING INVENTORY")
-print("-" * 35)
-print(f"{'Item':<12}{'Price':<10}{'Stock'}")
+Customer Order 1
+Enter item name: dosa
+Enter quantity: 2
+Order accepted.
+Item: Dosa
+Quantity: 2
+Bill Amount: Rs.60.00
 
-for item, details in inventory.items():
-    print(f"{item:<12}{details[0]:<10}{details[1]}")
+Customer Order 2
+Enter item name: tea
+Enter quantity: 3
+Order accepted.
+Item: Tea
+Quantity: 3
+Bill Amount: Rs.30.00
 
-print("=" * 45)
+Customer Order 3
+Enter item name: sandwich
+Enter quantity: 6
+Order rejected: Insufficient stock.
+Available stock: 5
+
+========== DAILY SALES REPORT ==========
+Successful Orders: 2
+Rejected Orders: 1
+Total Daily Sales: Rs.90.00
+
+Remaining Stock:
+Dosa        : 8 units
+Tea         : 17 units
+Sandwich    : 5 units
+Samosa      : 8 units
+========================================
