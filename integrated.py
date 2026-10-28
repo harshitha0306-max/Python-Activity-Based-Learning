@@ -1,147 +1,251 @@
+#Algorithm
+
+1. Start the program.
+2. Input the number of students.
+3. For each student, enter the student ID, name, total fees, fees paid, attendance percentage, and internal marks.
+4. Calculate the outstanding fee as total fees minus fees paid.
+5. Check whether the outstanding fee is greater than zero.
+6. Check whether attendance is below the minimum requirement of 75%.
+7. Check whether internal marks are below the minimum requirement of 40%.
+8. Record all outstanding conditions for each student.
+9. If no conditions are outstanding, mark the student as eligible for the examination.
+10. Otherwise, mark the student as having eligibility issues and list the reasons.
+11. Repeat the process for all students.
+12. Display the student-wise audit report and a summary of eligible and ineligible students.
+13. Stop the program.
+#Flowchart 
+             ┌────────────────────┐
+             │       START        │
+             └─────────┬──────────┘
+                       │
+             ┌─────────▼──────────┐
+             │ Enter Number of    │
+             │ Students           │
+             └─────────┬──────────┘
+                       │
+             ┌─────────▼──────────┐
+             │ Enter Student      │
+             │ Details            │
+             │ Fee, Attendance,   │
+             │ Internal Marks     │
+             └─────────┬──────────┘
+                       │
+             ┌─────────▼──────────┐
+             │ Calculate          │
+             │ Outstanding Fee   │
+             └─────────┬──────────┘
+                       │
+             ┌─────────▼──────────┐
+             │ Is Fee Payment     │
+             │ Pending?           │
+             └────┬─────────┬─────┘
+                 Yes         No
+                  │           │
+          ┌───────▼─────┐     │
+          │ Record Fee  │     │
+          │ Issue       │     │
+          └───────┬─────┘     │
+                  └─────┬─────┘
+                        │
+             ┌──────────▼─────────┐
+             │ Is Attendance      │
+             │ Below 75%?         │
+             └────┬─────────┬─────┘
+                 Yes         No
+                  │           │
+          ┌───────▼─────┐     │
+          │ Record      │     │
+          │ Attendance  │     │
+          │ Issue       │     │
+          └───────┬─────┘     │
+                  └─────┬─────┘
+                        │
+             ┌──────────▼─────────┐
+             │ Are Internal Marks │
+             │ Below 40?          │
+             └────┬─────────┬─────┘
+                 Yes         No
+                  │           │
+          ┌───────▼─────┐     │
+          │ Record      │     │
+          │ Marks Issue │     │
+          └───────┬─────┘     │
+                  └─────┬─────┘
+                        │
+             ┌──────────▼─────────┐
+             │ Any Outstanding    │
+             │ Conditions?        │
+             └────┬─────────┬─────┘
+                 Yes         No
+                  │           │
+          ┌───────▼─────┐ ┌───▼──────────┐
+          │ Mark as     │ │ Mark as      │
+          │ NOT ELIGIBLE│ │ ELIGIBLE     │
+          └───────┬─────┘ └───┬──────────┘
+                  │           │
+                  └─────┬─────┘
+                        │
+             ┌──────────▼─────────┐
+             │ More Students?     │
+             └────┬─────────┬─────┘
+                 Yes         No
+                  │           │
+                  │   ┌───────▼────────┐
+                  │   │ Generate Audit │
+                  │   │ Report and     │
+                  │   │ Summary        │
+                  │   └───────┬────────┘
+                  │           │
+                  │   ┌───────▼────────┐
+                  │   │      STOP      │
+                  │   └────────────────┘
+                  │
+                  └──── Repeat for
+                        next student
+#Code 
 
 # Integrated University Fee and Eligibility Audit
 
-# University eligibility rules
 MIN_ATTENDANCE = 75
 MIN_INTERNAL_MARKS = 40
 
-# Student records
-students = [
-    {
-        "id": "S101",
-        "name": "Ravi",
-        "total_fee": 50000,
-        "paid_fee": 50000,
-        "attendance": 85,
-        "internal_marks": 75,
-        "documents_submitted": True
-    },
-    {
-        "id": "S102",
-        "name": "Priya",
-        "total_fee": 50000,
-        "paid_fee": 35000,
-        "attendance": 80,
-        "internal_marks": 65,
-        "documents_submitted": True
-    },
-    {
-        "id": "S103",
-        "name": "Arun",
-        "total_fee": 50000,
-        "paid_fee": 50000,
-        "attendance": 68,
-        "internal_marks": 55,
-        "documents_submitted": True
-    },
-    {
-        "id": "S104",
-        "name": "Sneha",
-        "total_fee": 50000,
-        "paid_fee": 50000,
-        "attendance": 90,
-        "internal_marks": 32,
-        "documents_submitted": True
-    },
-    {
-        "id": "S105",
-        "name": "Kiran",
-        "total_fee": 50000,
-        "paid_fee": 40000,
-        "attendance": 65,
-        "internal_marks": 35,
-        "documents_submitted": False
-    }
-]
+students = []
+n = int(input("Enter number of students: "))
 
-reason_counts = {}
-eligible_count = 0
-ineligible_count = 0
+for i in range(n):
+    print(f"\nEnter details for Student {i + 1}")
 
-print("=" * 90)
-print("          INTEGRATED UNIVERSITY FEE AND ELIGIBILITY AUDIT")
-print("=" * 90)
+    student_id = input("Student ID: ")
+    name = input("Student Name: ")
+    total_fee = float(input("Total Fee: "))
+    fee_paid = float(input("Fee Paid: "))
+    attendance = float(input("Attendance Percentage: "))
+    internal_marks = float(input("Internal Marks (out of 100): "))
 
-print(
-    f"{'ID':<8}{'Name':<10}{'Due Fee':<12}"
-    f"{'Attend %':<12}{'Marks':<10}{'Result'}"
-)
-print("-" * 90)
-
-for student in students:
     reasons = []
 
     # Fee validation
-    if student["paid_fee"] < 0 or student["total_fee"] < 0:
-        reasons.append("Invalid fee record")
-        due_fee = None
+    if total_fee < 0 or fee_paid < 0 or fee_paid > total_fee:
+        reasons.append("Invalid fee records")
+        outstanding_fee = 0
     else:
-        due_fee = max(
-            0, student["total_fee"] - student["paid_fee"]
-        )
-        if student["paid_fee"] < student["total_fee"]:
-            reasons.append("Outstanding fee")
+        outstanding_fee = total_fee - fee_paid
+
+        if outstanding_fee > 0:
+            reasons.append("Fee payment pending")
 
     # Attendance validation
-    if not 0 <= student["attendance"] <= 100:
-        reasons.append("Invalid attendance record")
-    elif student["attendance"] < MIN_ATTENDANCE:
-        reasons.append("Low attendance")
+    if attendance < 0 or attendance > 100:
+        reasons.append("Invalid attendance records")
+    elif attendance < MIN_ATTENDANCE:
+        reasons.append("Attendance below 75%")
 
     # Internal marks validation
-    if not 0 <= student["internal_marks"] <= 100:
+    if internal_marks < 0 or internal_marks > 100:
         reasons.append("Invalid internal marks")
-    elif student["internal_marks"] < MIN_INTERNAL_MARKS:
-        reasons.append("Low internal marks")
+    elif internal_marks < MIN_INTERNAL_MARKS:
+        reasons.append("Internal marks below 40")
 
-    # Document validation
-    if not student["documents_submitted"]:
-        reasons.append("Documents pending")
+    eligible = len(reasons) == 0
 
-    # Determine examination eligibility
-    status = "ELIGIBLE" if not reasons else "NOT ELIGIBLE"
+    students.append({
+        "id": student_id,
+        "name": name,
+        "outstanding": outstanding_fee,
+        "attendance": attendance,
+        "internal": internal_marks,
+        "eligible": eligible,
+        "reasons": reasons
+    })
 
-    if status == "ELIGIBLE":
+# Generate audit report
+print("\n========== UNIVERSITY AUDIT REPORT ==========")
+
+eligible_count = 0
+ineligible_count = 0
+
+for s in students:
+    print(f"\nStudent ID: {s['id']}")
+    print(f"Name: {s['name']}")
+    print(f"Outstanding Fee: Rs. {s['outstanding']:.2f}")
+    print(f"Attendance: {s['attendance']:.1f}%")
+    print(f"Internal Marks: {s['internal']:.1f}/100")
+
+    if s["eligible"]:
+        print("Status: ELIGIBLE")
+        print("Reasons: None")
         eligible_count += 1
     else:
+        print("Status: NOT ELIGIBLE")
+        print("Outstanding Conditions:")
+        for reason in s["reasons"]:
+            print(f"- {reason}")
         ineligible_count += 1
 
-    # Count each reason
-    for reason in reasons:
-        reason_counts[reason] = reason_counts.get(reason, 0) + 1
+print("\n=============== SUMMARY ===============")
+print(f"Total Students: {n}")
+print(f"Eligible Students: {eligible_count}")
+print(f"Students with Issues: {ineligible_count}")
+print("=======================================")
 
-    due_display = (
-        f"{due_fee:.0f}" if due_fee is not None else "Invalid"
-    )
+#Sample output
+Enter number of students: 3
 
-    print(
-        f"{student['id']:<8}{student['name']:<10}"
-        f"{due_display:<12}"
-        f"{student['attendance']:<12}"
-        f"{student['internal_marks']:<10}"
-        f"{status}"
-    )
+Enter details for Student 1
+Student ID: 101
+Student Name: Ravi
+Total Fee: 50000
+Fee Paid: 50000
+Attendance Percentage: 85
+Internal Marks (out of 100): 75
 
-    # Print individual audit reasons
-    if reasons:
-        for reason in reasons:
-            print(f"  -> {reason}")
+Enter details for Student 2
+Student ID: 102
+Student Name: Priya
+Total Fee: 50000
+Fee Paid: 40000
+Attendance Percentage: 68
+Internal Marks (out of 100): 35
 
-# Final summary
-print("\n" + "=" * 90)
-print("                    AUDIT SUMMARY")
-print("=" * 90)
-print(f"Total Students       : {len(students)}")
-print(f"Eligible Students    : {eligible_count}")
-print(f"Not Eligible         : {ineligible_count}")
+Enter details for Student 3
+Student ID: 103
+Student Name: Arun
+Total Fee: 50000
+Fee Paid: 50000
+Attendance Percentage: 80
+Internal Marks (out of 100): 55
 
-print("\nREASON-WISE REPORT")
-print("-" * 45)
+========== UNIVERSITY AUDIT REPORT ==========
 
-if reason_counts:
-    for reason, count in sorted(reason_counts.items()):
-        print(f"{reason:<25}: {count} student(s)")
-else:
-    print("No outstanding conditions found.")
+Student ID: 101
+Name: Ravi
+Outstanding Fee: Rs. 0.00
+Attendance: 85.0%
+Internal Marks: 75.0/100
+Status: ELIGIBLE
+Reasons: None
 
-print("=" * 90)
+Student ID: 102
+Name: Priya
+Outstanding Fee: Rs. 10000.00
+Attendance: 68.0%
+Internal Marks: 35.0/100
+Status: NOT ELIGIBLE
+Outstanding Conditions:
+- Fee payment pending
+- Attendance below 75%
+- Internal marks below 40
+
+Student ID: 103
+Name: Arun
+Outstanding Fee: Rs. 0.00
+Attendance: 80.0%
+Internal Marks: 55.0/100
+Status: ELIGIBLE
+Reasons: None
+
+=============== SUMMARY ===============
+Total Students: 3
+Eligible Students: 2
+Students with Issues: 1
+=======================================
