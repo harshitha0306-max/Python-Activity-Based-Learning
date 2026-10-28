@@ -1,69 +1,185 @@
+#Algorithm
 
-def calculate_bill(units):
-    # Progressive electricity slab rates
-    if units <= 100:
-        energy_charge = units * 1.50
-    elif units <= 200:
-        energy_charge = 100 * 1.50 + (units - 100) * 2.50
-    elif units <= 300:
-        energy_charge = 100 * 1.50 + 100 * 2.50 + (units - 200) * 4.00
-    else:
-        energy_charge = (
-            100 * 1.50
-            + 100 * 2.50
-            + 100 * 4.00
-            + (units - 300) * 6.00
-        )
+1. Start the program.
+2. Read the number of products.
+3. For each product, input its name, category, price, and quantity.
+4. Calculate the subtotal for each product using price × quantity.
+5. Calculate tax based on the product category.
+6. Add all product subtotals to obtain the total subtotal.
+7. Calculate the discount based on the bill amount and discount thresholds.
+8. Apply the maximum concession limit to the discount.
+9. Calculate the final bill by adding taxes and subtracting the discount.
+10. Display the itemized invoice, including product details, taxes, discount, and final amount.
+11. Stop the program.
 
-    fixed_charge = 100
-    surcharge = energy_charge * 0.05
+#flow chart
+          ┌──────────────────┐
+          │      START       │
+          └────────┬─────────┘
+                   │
+          ┌────────▼─────────┐
+          │ Enter Number of  │
+          │ Months           │
+          └────────┬─────────┘
+                   │
+          ┌────────▼─────────┐
+          │ Enter Month and  │
+          │ Units Consumed   │
+          └────────┬─────────┘
+                   │
+          ┌────────▼─────────┐
+          │ Calculate Energy │
+          │ Charges by Slabs │
+          └────────┬─────────┘
+                   │
+          ┌────────▼─────────┐
+          │ Add Fixed Charges│
+          └────────┬─────────┘
+                   │
+          ┌────────▼─────────┐
+          │ Calculate        │
+          │ Surcharge        │
+          └────────┬─────────┘
+                   │
+          ┌────────▼─────────┐
+          │ Check Rebate     │
+          │ Eligibility      │
+          └────────┬─────────┘
+                   │
+          ┌────────▼─────────┐
+          │ Calculate Final  │
+          │ Electricity Bill │
+          └────────┬─────────┘
+                   │
+          ┌────────▼─────────┐
+          │ Are More Months  │
+          │ Remaining?       │
+          └────┬────────┬────┘
+               │        │
+             YES        NO
+               │        │
+        ┌──────▼────┐   │
+        │ Enter Next│   │
+        │ Month     │   │
+        └──────┬────┘   │
+               │        │
+               └───↺    ▼
+                 ┌─────────────────┐
+                 │ Compare Monthly │
+                 │ Bills           │
+                 └────────┬────────┘
+                          │
+                 ┌────────▼────────┐
+                 │ Is Increase     │
+                 │ More Than 20%?  │
+                 └────┬────────┬───┘
+                      │        │
+                     YES       NO
+                      │        │
+             ┌────────▼───┐ ┌──▼────────────┐
+             │ Mark as    │ │ Normal Bill   │
+             │ Unusual    │ │ Change        │
+             └──────┬─────┘ └──────┬────────┘
+                    │              │
+                    └──────┬───────┘
+                           │
+                  ┌────────▼────────┐
+                  │ Display Monthly │
+                  │ Bills and Report│
+                  └────────┬────────┘
+                           │
+                  ┌────────▼────────┐
+                  │      STOP       │
+                  └─────────────────┘
+#code
 
-    # Rebate for consumption up to 100 units
-    rebate = 50 if units <= 100 else 0
+# Retail Billing with Multiple Discount Rules
 
-    total_bill = (
-        energy_charge + fixed_charge + surcharge - rebate
-    )
+tax_rates = {
+    "electronics": 18,
+    "clothing": 12,
+    "groceries": 5,
+    "other": 10
+}
 
-    return round(total_bill, 2)
+products = []
+total_subtotal = 0
+total_tax = 0
 
+n = int(input("Enter number of products: "))
 
-# Monthly electricity consumption
-months = ["January", "February", "March", "April", "May"]
-consumption = [80, 120, 180, 250, 400]
+for i in range(n):
+    print(f"\nProduct {i + 1}")
 
-bills = []
+    name = input("Enter product name: ")
+    category = input("Enter category (electronics/clothing/groceries/other): ").lower()
+    price = float(input("Enter unit price: "))
+    quantity = int(input("Enter quantity: "))
 
-print("MONTHLY ELECTRICITY BILL")
-print("-" * 55)
-print(f"{'Month':<12}{'Units':<10}{'Bill (Rs.)':<15}{'Change (%)'}")
-print("-" * 55)
+    if category not in tax_rates:
+        print("Invalid category! Using 10% tax.")
+        category = "other"
 
-for i in range(len(months)):
-    bill = calculate_bill(consumption[i])
-    bills.append(bill)
+    subtotal = price * quantity
+    tax = subtotal * tax_rates[category] / 100
 
-    if i == 0:
-        change = 0
-        change_text = "N/A"
-    else:
-        change = (
-            (bill - bills[i - 1]) / bills[i - 1]
-        ) * 100
-        change_text = f"{change:.2f}%"
+    products.append({
+        "name": name,
+        "category": category,
+        "price": price,
+        "quantity": quantity,
+        "subtotal": subtotal,
+        "tax": tax
+    })
 
-    print(
-        f"{months[i]:<12}{consumption[i]:<10}"
-        f"{bill:<15.2f}{change_text}"
-    )
+    total_subtotal += subtotal
+    total_tax += tax
 
-    # Identify unusual increases above 30%
-    if i > 0 and change > 30:
-        print("  WARNING: Unusual bill increase detected!")
+# Apply threshold discount
+if total_subtotal >= 5000:
+    discount = total_subtotal * 0.10
+elif total_subtotal >= 2000:
+    discount = total_subtotal * 0.05
+else:
+    discount = 0
 
-print("-" * 55)
-print(f"Total electricity cost: Rs. {sum(bills):.2f}")
-print(f"Average monthly bill: Rs. {sum(bills) / len(bills):.2f}")
+# Apply maximum concession limit
+discount = min(discount, 1000)
 
-highest_index = bills.index(max(bills))
-print(f"Highest bill: {months[highest_index]} - Rs. {bills[highest_index]:.2f}")
+final_amount = total_subtotal + total_tax - discount
+
+# Print itemized invoice
+print("\n========== RETAIL INVOICE ==========")
+print(f"{'Product':<15}{'Qty':>5}{'Subtotal':>12}{'Tax':>10}")
+
+for p in products:
+    print(f"{p['name']:<15}{p['quantity']:>5}"
+          f"{p['subtotal']:>12.2f}{p['tax']:>10.2f}")
+
+print("------------------------------------")
+print(f"Subtotal       : Rs. {total_subtotal:.2f}")
+print(f"Total Tax      : Rs. {total_tax:.2f}")
+print(f"Discount       : Rs. {discount:.2f}")
+print(f"Final Amount   : Rs. {final_amount:.2f}")
+print("====================================")
+
+#sample output
+Enter number of products: 3
+
+Product 1
+Enter product name: Laptop
+Enter category (electronics/clothing/groceries/other): electronics
+Enter unit price: 50000
+Enter quantity: 1
+
+Product 2
+Enter product name: Shirt
+Enter category (electronics/clothing/groceries/other): clothing
+Enter unit price: 1000
+Enter quantity: 2
+
+Product 3
+Enter product name: Rice
+Enter category (electronics/clothing/groceries/other): groceries
+Enter unit price: 200
+Enter quantity: 5
